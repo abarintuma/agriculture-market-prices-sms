@@ -4,13 +4,43 @@ services:
     container_name: agri_postgres_db
     restart: always
     environment:
-      POSTGRES_USER: agri_user
-      POSTGRES_PASSWORD: agri_password
-      POSTGRES_DB: agri_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  # --- FastAPI Backend ---
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: agri_backend
+    restart: always
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    depends_on:
+      - db
+
+  # --- Next.js Frontend ---
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:8000/api/v1
+    container_name: agri_frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
 
 volumes:
   postgres_data:
