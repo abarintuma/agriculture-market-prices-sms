@@ -1,0 +1,58 @@
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from app.core.config import settings
+from app.api.v1.router import api_router
+
+# 1. Initialize FastAPI Application Instance
+app = FastAPI(
+    title=settings.PROJECT_NAME,
+    description="Backend API for Agri-Market SMS updates, weather integration, and price management.",
+    version="1.0.0",
+    docs_url="/docs",       # Interactive Swagger UI documentation
+    redoc_url="/redoc",     # Alternative ReDoc documentation
+)
+
+# 2. Configure CORS (Cross-Origin Resource Sharing)
+# This allows your Next.js frontend (running on http://localhost:3000)
+# to make HTTP requests to this FastAPI backend without browser CORS errors.
+origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows GET, POST, PUT, DELETE, OPTIONS, etc.
+    allow_headers=["*"],  # Allows all standard request headers
+)
+
+# 3. Mount Central API Router
+# All API endpoints in app/api/v1/ will now be prefixed with /api/v1
+app.include_router(api_router, prefix="/api/v1")
+
+
+# 4. Root & Health Check Endpoints
+@app.get("/", tags=["Health Check"])
+def root_check():
+    """
+    Root endpoint returning basic app metadata.
+    """
+    return {
+        "app": settings.PROJECT_NAME,
+        "status": "online",
+        "docs": "/docs",
+        "version": "1.0.0"
+    }
+
+
+@app.get("/health", tags=["Health Check"])
+def health_check():
+    """
+    Used by load balancers, Docker, or monitoring tools to check system uptime.
+    """
+    return {"status": "healthy"}
