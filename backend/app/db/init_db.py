@@ -1,4 +1,8 @@
 import logging
+import time
+
+from sqlalchemy import text
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
 
 #  engine, Base, and Session factory from our session module
@@ -38,15 +42,29 @@ def init_db(db: Session) -> None:
 
 def create_tables() -> None:
     """
-    Connects to PostgreSQL in Docker and executes 'CREATE TABLE IF NOT EXISTS'
-    for every model defined under Base.
+    Waits for PostgreSQL to be ready, creates all tables, and seeds default data.
     """
+    logger.info("Waiting for PostgreSQL to become available...")
+
+    last_error: Exception | None = None
+    for attempt in range(30):
+        try:
+            with engine.connect() as connection:
+                connection.execute(text("SELECT 1"))
+            break
+        except OperationalError as exc:
+            last_error = exc
+            logger.warning("Database is not ready yet (%s). Retrying in 2 seconds...", exc)
+            time.sleep(2)
+    else:
+        raise RuntimeError("Database did not become ready in time.") from last_error
+
     logger.info("Creating PostgreSQL tables inside Docker container...")
-    
+
     # Base.metadata inspects all subclasses of Base (Crop, Farmer, etc.)
     # and generates raw PostgreSQL SQL statements to create tables.
     Base.metadata.create_all(bind=engine)
-    
+
     logger.info("All tables created successfully!")
 
     # Open a temporary database session to run the seed script

@@ -36,6 +36,14 @@ app.add_middleware(
 app.include_router(api_router, prefix="/api/v1")
 
 
+@app.on_event("startup")
+def initialize_database() -> None:
+    """Create database tables and seed defaults before serving requests."""
+    from app.db.init_db import create_tables
+
+    create_tables()
+
+
 # 4. Root & Health Check Endpoints
 @app.get("/", tags=["Health Check"])
 def root_check():
