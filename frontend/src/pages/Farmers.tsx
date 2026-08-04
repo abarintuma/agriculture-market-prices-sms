@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { api, Farmer } from '@/lib/api';
 import {
   Users,
@@ -27,7 +27,7 @@ const COMMON_DISTRICTS = [
   'Masaka',
 ];
 
-export const FarmersPage: React.FC = () => {
+export const FarmersPage = () => {
   const [farmers, setFarmers] = useState<Farmer[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -101,7 +101,7 @@ export const FarmersPage: React.FC = () => {
   });
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="space-y-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>

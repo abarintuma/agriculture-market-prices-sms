@@ -14,13 +14,16 @@ app = FastAPI(
 )
 
 # 2. Configure CORS (Cross-Origin Resource Sharing)
-# This allows your Next.js frontend (running on http://localhost:3000)
-# to make HTTP requests to this FastAPI backend without browser CORS errors.
+# Allows the React + Vite frontend (port 3000) to call this API without browser CORS errors.
+# When using docker-compose with Nginx reverse-proxying /api -> backend, the Origin header
+# will be the frontend URL, so we must list it explicitly.
 origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "http://localhost:8000",
     "http://127.0.0.1:8000",
+    # Add your production frontend domain here when deploying:
+    # "https://yourdomain.com",
 ]
 
 app.add_middleware(

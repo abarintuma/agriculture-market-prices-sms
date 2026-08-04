@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { api, CropPrice, Farmer, Crop } from '@/lib/api';
 import {
   Users,
@@ -8,14 +8,12 @@ import {
   CheckCircle2,
   AlertCircle,
   RefreshCw,
-  Sparkles,
-  ArrowUpRight,
   ShieldCheck,
   Building2,
   Clock
 } from 'lucide-react';
 
-export const OverviewPage: React.FC = () => {
+export const OverviewPage = () => {
   const [farmers, setFarmers] = useState<Farmer[]>([]);
   const [crops, setCrops] = useState<Crop[]>([]);
   const [prices, setPrices] = useState<CropPrice[]>([]);
@@ -70,7 +68,7 @@ export const OverviewPage: React.FC = () => {
   const activeFarmersCount = farmers.filter((f) => f.is_active).length;
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="space-y-8">
       {/* Welcome Hero Banner */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-950/70 via-slate-900 to-slate-900 border border-emerald-800/30 p-6 lg:p-8 shadow-2xl">
         <div className="absolute top-0 right-0 -mt-8 -mr-8 w-64 h-64 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />

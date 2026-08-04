@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { api, Crop, CropPrice } from '@/lib/api';
 import {
   Sprout,
@@ -14,7 +14,7 @@ import {
   Clock
 } from 'lucide-react';
 
-export const CropsPricesPage: React.FC = () => {
+export const CropsPricesPage = () => {
   const [crops, setCrops] = useState<Crop[]>([]);
   const [prices, setPrices] = useState<CropPrice[]>([]);
   const [loading, setLoading] = useState(true);
@@ -122,7 +122,7 @@ export const CropsPricesPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="space-y-8">
       {/* Header Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>

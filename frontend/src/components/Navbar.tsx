@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Menu, RefreshCw, Radio, Calendar, CheckCircle2 } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { Menu, RefreshCw, Calendar } from "lucide-react";
 
 interface NavbarProps {
   title: string;
@@ -10,27 +10,27 @@ interface NavbarProps {
   backendConnected?: boolean;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({
+export const Navbar = ({
   title,
   subtitle,
   onRefresh,
   loading = false,
   onToggleMobileSidebar,
   backendConnected = true,
-}) => {
-  const [currentTime, setCurrentTime] = useState<string>('');
+}: NavbarProps) => {
+  const [currentTime, setCurrentTime] = useState<string>("");
 
   useEffect(() => {
     const updateClock = () => {
       const now = new Date();
       setCurrentTime(
-        now.toLocaleDateString('en-GB', {
-          weekday: 'short',
-          day: 'numeric',
-          month: 'short',
-          hour: '2-digit',
-          minute: '2-digit',
-        })
+        now.toLocaleDateString("en-GB", {
+          weekday: "short",
+          day: "numeric",
+          month: "short",
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
       );
     };
     updateClock();
@@ -71,11 +71,13 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="flex items-center space-x-2 px-3 py-1.5 bg-slate-900/90 border border-slate-800 rounded-xl text-xs">
           <div
             className={`w-2 h-2 rounded-full ${
-              backendConnected ? 'bg-emerald-400 shadow-sm shadow-emerald-400 animate-pulse' : 'bg-amber-400'
+              backendConnected
+                ? "bg-emerald-400 shadow-sm shadow-emerald-400 animate-pulse"
+                : "bg-amber-400"
             }`}
           />
           <span className="text-slate-300 font-medium text-[11px] hidden sm:inline">
-            {backendConnected ? 'API Connected' : 'API Connecting'}
+            {backendConnected ? "API Connected" : "API Connecting"}
           </span>
         </div>
 
@@ -87,7 +89,9 @@ export const Navbar: React.FC<NavbarProps> = ({
             className="flex items-center space-x-2 px-3.5 py-2 bg-slate-900 hover:bg-slate-800 active:bg-slate-800/80 border border-slate-800 text-slate-200 rounded-xl text-xs font-semibold transition-all shadow-sm disabled:opacity-50"
             title="Refresh current data"
           >
-            <RefreshCw className={`w-3.5 h-3.5 text-emerald-400 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw
+              className={`w-3.5 h-3.5 text-emerald-400 ${loading ? "animate-spin" : ""}`}
+            />
             <span className="hidden sm:inline">Refresh</span>
           </button>
         )}

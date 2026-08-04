@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import Sidebar from '@/components/Sidebar';
 import Navbar from '@/components/Navbar';
@@ -27,7 +27,7 @@ const routeTitles: Record<string, { title: string; subtitle: string }> = {
   },
 };
 
-const MainLayout: React.FC = () => {
+const MainLayout = () => {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [backendConnected, setBackendConnected] = useState(true);
@@ -92,7 +92,7 @@ const MainLayout: React.FC = () => {
   );
 };
 
-export const App: React.FC = () => {
+export const App = () => {
   return (
     <BrowserRouter>
       <MainLayout />

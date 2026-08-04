@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { api, Farmer, SMSBroadcastResponse } from '@/lib/api';
 import {
   Send,
@@ -37,7 +37,7 @@ interface BroadcastLogEntry extends SMSBroadcastResponse {
   customNote: string;
 }
 
-export const SMSBroadcastPage: React.FC = () => {
+export const SMSBroadcastPage = () => {
   const [farmers, setFarmers] = useState<Farmer[]>([]);
   const [loadingFarmers, setLoadingFarmers] = useState(true);
 
@@ -114,7 +114,7 @@ export const SMSBroadcastPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="space-y-8">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
