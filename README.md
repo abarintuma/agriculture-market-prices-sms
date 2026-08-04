@@ -1,6 +1,6 @@
  Agri-Market SMS
 
-Agri-Market SMS is a full-stack application that enables agricultural market prices monitoring and SMS updates for farmers. The system combines a FastAPI backend, a Next.js dashboard, PostgreSQL persistence, live weather integration, and Twilio SMS delivery.
+Agri-Market SMS is a full-stack application that enables agricultural market prices monitoring and SMS updates for farmers. The system combines a FastAPI backend, a react dashboard, PostgreSQL persistence, live weather integration, and Twilio SMS delivery.
 
  Key Features
 
@@ -13,13 +13,13 @@ Agri-Market SMS is a full-stack application that enables agricultural market pri
  Architecture
 
 - backend — FastAPI application providing REST endpoints, database models, SMS broadcast logic, and weather integration
-- frontend — Next.js app with dashboard pages for farmers, prices, and SMS broadcasts
+- frontend — react app with dashboard pages for farmers, prices, and SMS broadcasts
 - docker-compose.yml — Compose stack for PostgreSQL, backend, and frontend services
 
  Technology Stack
 
 - Backend: Python 3.14, FastAPI, SQLAlchemy, Pydantic, Twilio, Uvicorn
-- Frontend: Next.js, TypeScript, Tailwind CSS
+- Frontend: react, TypeScript, Tailwind CSS
 - Database: PostgreSQL 16
 - Deployment: Docker, Docker Compose
 
@@ -45,7 +45,7 @@ TWILIO_AUTH_TOKEN=your_twilio_auth_token
 TWILIO_PHONE_NUMBER=twilio_phone_number
 
 
-Note: The backend uses DATABASE_URL for the PostgreSQL connection string. The frontend uses NEXT_PUBLIC_API_URL during Docker builds.
+Note: The backend uses DATABASE_URL for the PostgreSQL connection string. The frontend uses REACT_PUBLIC_API_URL during Docker builds.
 
 Run with Docker Compose
 
