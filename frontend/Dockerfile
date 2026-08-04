@@ -1,39 +1,34 @@
-# --- Stage 1: Install Dependencies ---
-FROM node:24-alpine AS deps
+# --- Stage 1: Install & Build Vite SPA ---
+FROM node:24-alpine AS builder
 WORKDIR /app
+
 COPY package.json package-lock.json ./
 RUN npm ci
 
-# --- Stage 2: Build Application ---
-FROM node:24-alpine AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+ARG VITE_API_URL=http://localhost:8000/api/v1
 ARG NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+ENV VITE_API_URL=$VITE_API_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
-ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN npm run build
 
-# --- Stage 3: Production Runner ---
-FROM node:24-alpine AS runner
-WORKDIR /app
+# --- Stage 2: Serve Production Assets with Nginx ---
+FROM nginx:alpine AS runner
 
-ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
-
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
-
-USER nextjs
+# SPA fallbacks to index.html for client-side routing
+RUN echo 'server { \
+    listen 3000; \
+    location / { \
+        root /usr/share/nginx/html; \
+        index index.html index.htm; \
+        try_files $uri $uri/ /index.html; \
+    } \
+}' > /etc/nginx/conf.d/default.conf
 
 EXPOSE 3000
-ENV PORT=3000
 
-CMD ["npm", "start"]
+CMD ["nginx", "-g", "daemon off;"]

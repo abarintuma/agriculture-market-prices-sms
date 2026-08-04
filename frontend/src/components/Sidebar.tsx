@@ -1,71 +1,176 @@
-'use client';
-
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { 
-  LayoutDashboard, 
-  Sprout, 
-  Users, 
-  Send, 
-  TrendingUp,
-  Activity
+import React from 'react';
+import { NavLink } from 'react-router-dom';
+import {
+  LayoutDashboard,
+  Sprout,
+  Users,
+  Send,
+  Activity,
+  ChevronRight,
+  Sparkles,
+  X
 } from 'lucide-react';
 
-const navigation = [
-  { name: 'Overview', href: '/', icon: LayoutDashboard },
-  { name: 'Crops & Prices', href: '/prices', icon: Sprout },
-  { name: 'Farmers', href: '/farmers', icon: Users },
-  { name: 'SMS Broadcasts', href: '/sms', icon: Send },
+interface SidebarProps {
+  mobileOpen?: boolean;
+  onCloseMobile?: () => void;
+  backendConnected?: boolean;
+}
+
+const navItems = [
+  {
+    name: 'Overview',
+    path: '/',
+    icon: LayoutDashboard,
+    description: 'Real-time metrics & instant trigger',
+  },
+  {
+    name: 'Crops & Prices',
+    path: '/prices',
+    icon: Sprout,
+    description: 'Commodities & market updates',
+  },
+  {
+    name: 'Farmers Directory',
+    path: '/farmers',
+    icon: Users,
+    description: 'SMS subscribers by district',
+  },
+  {
+    name: 'SMS Broadcast Hub',
+    path: '/sms',
+    icon: Send,
+    description: 'Twilio SMS dispatcher & simulator',
+  },
 ];
 
-export default function Sidebar() {
-  const pathname = usePathname();
-
+export const Sidebar: React.FC<SidebarProps> = ({
+  mobileOpen = false,
+  onCloseMobile,
+  backendConnected = true,
+}) => {
   return (
-    <aside className="w-64 bg-slate-900 text-slate-100 flex flex-col min-h-screen border-r border-slate-800">
-      {/* Brand Header */}
-      <div className="p-6 border-b border-slate-800 flex items-center space-x-3">
-        <div className="p-2 bg-emerald-600 rounded-lg text-white">
-          <Sprout className="w-6 h-6" />
-        </div>
-        <div>
-          <h1 className="font-bold text-lg text-white leading-none">Agri-SMS</h1>
-          <span className="text-xs text-slate-400 font-medium">Market Admin</span>
-        </div>
-      </div>
+    <>
+      {/* Mobile Backdrop */}
+      {mobileOpen && (
+        <div
+          onClick={onCloseMobile}
+          className="fixed inset-0 z-40 bg-slate-950/80 backdrop-blur-sm lg:hidden transition-opacity"
+        />
+      )}
 
-      {/* Navigation Links */}
-      <nav className="flex-1 p-4 space-y-1">
-        {navigation.map((item) => {
-          const isActive = pathname === item.href;
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.name}
-              href={item.href}
-              className={`flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm transition-colors ${
-                isActive
-                  ? 'bg-emerald-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
-              }`}
-            >
-              <Icon className="w-5 h-5" />
-              <span>{item.name}</span>
-            </Link>
-          );
-        })}
-      </nav>
+      {/* Sidebar Container */}
+      <aside
+        className={`fixed lg:static top-0 left-0 z-50 h-full w-72 bg-slate-900/95 backdrop-blur-xl border-r border-slate-800/80 flex flex-col justify-between transition-transform duration-300 ease-in-out ${mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+          }`}
+      >
+        <div className="flex flex-col h-full">
+          {/* Brand Header */}
+          <div className="p-6 border-b border-slate-800/80 flex items-center justify-between">
+            <div className="flex items-center space-x-3.5">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 p-0.5 shadow-lg shadow-emerald-950/50 flex items-center justify-center">
+                <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
+                  <Sprout className="w-5 h-5 text-emerald-400" />
+                </div>
+              </div>
+              <div>
+                <div className="flex items-center space-x-1.5">
+                  <h1 className="font-extrabold text-base tracking-tight text-white">
+                    Agri-SMS
+                  </h1>
+                </div>
+                <p className="text-xs text-slate-400 font-medium">Market Admin Portal</p>
+              </div>
+            </div>
 
-      {/* Backend System Connection Status */}
-      <div className="p-4 border-t border-slate-800">
-        <div className="bg-slate-800/60 rounded-xl p-3 flex items-center space-x-3 border border-slate-700/50">
-          <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-          <div className="text-xs">
-            <p className="font-medium text-slate-200">FastAPI Backend</p>
-            <p className="text-slate-400">Connected (Port 8000)</p>
+            {/* Mobile Close Button */}
+            {onCloseMobile && (
+              <button
+                onClick={onCloseMobile}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 lg:hidden"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
+          </div>
+
+          {/* Navigation Links */}
+          <div className="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
+            <div className="px-3 mb-2 text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
+              Main Menu
+            </div>
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  onClick={onCloseMobile}
+                  className={({ isActive }) =>
+                    `group relative flex items-center space-x-3.5 px-3.5 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${isActive
+                      ? 'bg-gradient-to-r from-emerald-600/90 to-emerald-700/90 text-white shadow-md shadow-emerald-950/50'
+                      : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/60'
+                    }`
+                  }
+                >
+                  {({ isActive }) => (
+                    <>
+                      <Icon
+                        className={`w-5 h-5 shrink-0 transition-transform duration-200 group-hover:scale-110 ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-emerald-400'
+                          }`}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <span className="truncate">{item.name}</span>
+                          {isActive && (
+                            <ChevronRight className="w-4 h-4 text-emerald-200 shrink-0" />
+                          )}
+                        </div>
+                        <p
+                          className={`text-[11px] truncate mt-0.5 ${isActive ? 'text-emerald-100/80' : 'text-slate-400'
+                            }`}
+                        >
+                          {item.description}
+                        </p>
+                      </div>
+                    </>
+                  )}
+                </NavLink>
+              );
+            })}
+          </div>
+
+          {/* System Status Footer Card */}
+          <div className="p-4 border-t border-slate-800/80">
+            <div className="p-3.5 bg-slate-950/80 rounded-2xl border border-slate-800/90 space-y-2.5">
+              <div className="flex items-center justify-between text-xs">
+                <div className="flex items-center space-x-2">
+                  <div
+                    className={`w-2.5 h-2.5 rounded-full ${backendConnected
+                        ? 'bg-emerald-500 shadow-sm shadow-emerald-500 animate-pulse'
+                        : 'bg-amber-500'
+                      }`}
+                  />
+                  <span className="font-semibold text-slate-200">FastAPI Service</span>
+                </div>
+                <span
+                  className={`text-[10px] font-mono px-2 py-0.5 rounded-full border ${backendConnected
+                      ? 'bg-emerald-950/80 text-emerald-400 border-emerald-800/60'
+                      : 'bg-amber-950/80 text-amber-400 border-amber-800/60'
+                    }`}
+                >
+                  {backendConnected ? 'ONLINE' : 'CONNECTING'}
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-400 leading-tight">
+                Backend connected via REST API on Port 8000
+              </p>
+            </div>
           </div>
         </div>
-      </div>
-    </aside>
+      </aside>
+    </>
   );
-}
+};
+
+export default Sidebar;

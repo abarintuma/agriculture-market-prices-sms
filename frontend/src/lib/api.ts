@@ -1,5 +1,8 @@
+// Support Vite environment variable, fallback to NEXT_PUBLIC_API_URL, default to local FastAPI backend
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+  (import.meta.env.VITE_API_URL as string) ||
+  (import.meta.env.NEXT_PUBLIC_API_URL as string) ||
+  "http://localhost:8000/api/v1";
 
 // TypeScript Interfaces matching our FastAPI Pydantic Schemas
 export interface Crop {
@@ -34,26 +37,50 @@ export interface SMSBroadcastResponse {
   message_preview: string;
 }
 
-// Helper fetch wrapper
+// Helper fetch wrapper with improved timeout and error parsing
 async function fetcher<T>(endpoint: string, options?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    headers: {
-      "Content-Type": "application/json",
-      ...options?.headers,
-    },
-    ...options,
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.detail || `API error: ${response.statusText}`);
+  try {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+      },
+      signal: controller.signal,
+      ...options,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.detail || `API error: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (err: any) {
+    clearTimeout(timeoutId);
+    if (err.name === "AbortError") {
+      throw new Error("Request timed out. Please check backend connection.");
+    }
+    throw err;
   }
-
-  return response.json();
 }
 
 // API Service Methods
 export const api = {
+  // Health check
+  checkHealth: async (): Promise<boolean> => {
+    try {
+      await fetcher<Crop[]>("/crops/");
+      return true;
+    } catch {
+      return false;
+    }
+  },
+
   // Crops
   getCrops: () => fetcher<Crop[]>("/crops/"),
   createCrop: (name: string, unit: string) =>
@@ -67,7 +94,7 @@ export const api = {
   recordPrice: (
     crop_id: number,
     price_ugx: number,
-    market_location = "Kampala",
+    market_location = "Kampala"
   ) =>
     fetcher<CropPrice>("/prices/", {
       method: "POST",
@@ -79,7 +106,7 @@ export const api = {
   registerFarmer: (
     full_name: string,
     phone_number: string,
-    district = "Kampala",
+    district = "Kampala"
   ) =>
     fetcher<Farmer>("/farmers/", {
       method: "POST",
